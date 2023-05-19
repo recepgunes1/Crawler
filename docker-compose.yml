@@ -1,0 +1,20 @@
+﻿version: "3.3"
+
+services:
+  s_rabbitmq:
+    container_name: c_rabbitmq
+    image: rabbitmq:3.11-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  s_webapi:
+    container_name: c_webapi
+    image: crawler.webapi
+    build:
+      context: .
+      dockerfile: src/Crawler.WebAPI/Dockerfile
+    ports:
+      - "8080:80"
+      - "8081:443"
+    depends_on:
+      - s_rabbitmq
