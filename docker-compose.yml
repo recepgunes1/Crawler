@@ -7,6 +7,18 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+
+  s_database:
+    container_name: c_database
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: Password123.
+      POSTGRES_USER: postgres
+      POSTGRES_DB: crawler
+    ports:
+      - "5432:5432"
+    
   s_webapi:
     container_name: c_webapi
     image: crawler.webapi
@@ -15,6 +27,26 @@ services:
       dockerfile: src/Crawler.WebAPI/Dockerfile
     ports:
       - "8080:80"
-      - "8081:443"
+    depends_on: 
+      - s_database
+      - s_rabbitmq
+
+  s_pagedownloader:
+    container_name: c_pagedownloader
+    image: crawler.pagedownloader
+    build:
+      context: .
+      dockerfile: src/Crawler.PageDownloader/Dockerfile
     depends_on:
+      - s_database
+      - s_rabbitmq
+  
+  s_linkextractor:
+    container_name: c_linkextractor
+    image: crawler.linkextractor
+    build:
+      context: .
+      dockerfile: src/Crawler.LinkExtractor/Dockerfile
+    depends_on:
+      - s_database
       - s_rabbitmq
