@@ -14,11 +14,13 @@ public class ProcessController : Controller
 {
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly ILogger<ProcessController> _logger;
+    private readonly AppDbContext _appDbContext;
 
-    public ProcessController(IPublishEndpoint publishEndpoint, ILogger<ProcessController> logger)
+    public ProcessController(IPublishEndpoint publishEndpoint, ILogger<ProcessController> logger, AppDbContext appDbContext)
     {
         _publishEndpoint = publishEndpoint;
         _logger = logger;
+        _appDbContext = appDbContext;
     }
 
     [HttpPost]
@@ -33,13 +35,10 @@ public class ProcessController : Controller
         });
 
         _logger.LogInformation("Published RequestedUrl message successfully");
-        await using (AppDbContext context = new())
-        {
-            await context.Links.AddAsync(new Link
-                { Id = id, SourceId = Guid.Empty.ToString(), Url = dto.Url, Status = Status.Requested });
-            await context.SaveChangesAsync();
-            _logger.LogInformation("New Job added to the repository successfully");
-        }
+        await _appDbContext.Links.AddAsync(new Link
+            { Id = id, SourceId = Guid.Empty.ToString(), Url = dto.Url, Status = Status.Requested });
+        await _appDbContext.SaveChangesAsync();
+        _logger.LogInformation("New Job added to the repository successfully");
 
         _logger.LogInformation("Returning Ok from Start method");
         return Ok();

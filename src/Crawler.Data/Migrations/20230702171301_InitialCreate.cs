@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Crawler.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,6 +40,12 @@ namespace Crawler.Data.Migrations
                 {
                     table.PrimaryKey("PK_PageData", x => x.Id);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Links_Url",
+                table: "Links",
+                column: "Url",
+                unique: true);
         }
 
         /// <inheritdoc />

@@ -3,14 +3,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Crawler.Data.Context;
 
-public class AppDbContext : DbContext
+public sealed class AppDbContext : DbContext
 {
     public DbSet<Link> Links { get; set; } = default!;
     public DbSet<PageDatum> PageData { get; set; } = default!;
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-        base.OnConfiguring(optionsBuilder);
-        optionsBuilder.UseNpgsql("Host=s_database;Port=5432;Database=crawler;Username=postgres;Password=Password123.");
+    }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Link>(p => p.HasIndex(c => c.Url).IsUnique());
     }
 }
