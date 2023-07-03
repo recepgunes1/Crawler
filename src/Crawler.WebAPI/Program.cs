@@ -1,19 +1,22 @@
 using Crawler.Data.Context;
+using Crawler.Shared.Configuration;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddDbContext<AppDbContext>();
+Console.WriteLine(builder.Configuration.GetConnectionString("postgresql"));
+builder.Services.AddDbContext<AppDbContext>(p => p.UseNpgsql(builder.Configuration.GetConnectionString("postgresql")));
 
 builder.Services.AddMassTransit(p =>
     {
+        var rabbitMqConfig = builder.Configuration.GetSection("rabbitmq").Get<RabbitMqConfigModel>() ??
+                             throw new ArgumentException("rabbitmq section doesnt exist");
         p.UsingRabbitMq((ctx, cfg) =>
         {
-            cfg.Host("s_rabbitmq", 5672, "/", conf =>
+            cfg.Host(rabbitMqConfig.Host, rabbitMqConfig.Port, rabbitMqConfig.VirtualHost, conf =>
             {
-                conf.Username("guest");
-                conf.Password("guest");
+                conf.Username(rabbitMqConfig.Username);
+                conf.Password(rabbitMqConfig.Password);
             });
             cfg.ConfigureEndpoints(ctx);
         });
@@ -29,12 +32,6 @@ var app = builder.Build();
 app.UseSwagger();
 
 app.UseSwaggerUI();
-
-using (var serviceScope = app.Services.GetService<IServiceScopeFactory>()?.CreateScope())
-{
-    var context = serviceScope?.ServiceProvider.GetRequiredService<AppDbContext>();
-    context?.Database.Migrate();
-}
 
 app.MapControllers();
 

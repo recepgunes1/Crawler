@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Crawler.PageDownloader;
+using Microsoft.Extensions.Configuration;
 using Topshelf;
 using Topshelf.Runtime.DotNetCore;
 
@@ -9,10 +10,16 @@ HostFactory.Run(h =>
     {
         h.UseEnvironmentBuilder(target => new DotNetCoreEnvironmentBuilder(target));
     }
-
+    
     h.Service<PageDownloaderService>(s =>
     {
-        s.ConstructUsing(_ => new PageDownloaderService("page-downloaded-service"));
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.Development.json", optional: false);
+
+        IConfiguration config = builder.Build();
+
+        s.ConstructUsing(_ => new PageDownloaderService("page-downloaded-service", config));
         s.WhenStarted(tc => tc.Start(null));
         s.WhenStopped(tc => tc.Stop(null));
     });
