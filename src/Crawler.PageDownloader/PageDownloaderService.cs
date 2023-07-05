@@ -11,7 +11,8 @@ public class PageDownloaderService
 
     public PageDownloaderService(string queueName, IConfiguration configuration)
     {
-        var rabbitMqConfig = configuration.GetSection("rabbitmq").Get<RabbitMqConfigModel>() ?? throw new ArgumentException("rabbitmq section doesnt exist");
+        var rabbitMqConfig = configuration.GetSection("rabbitmq").Get<RabbitMqConfigModel>() ??
+                             throw new ArgumentException("rabbitmq section doesnt exist");
         _busControl = Bus.Factory.CreateUsingRabbitMq(cfg =>
         {
             cfg.Host(rabbitMqConfig.Host, rabbitMqConfig.Port, rabbitMqConfig.VirtualHost, s =>
@@ -19,7 +20,11 @@ public class PageDownloaderService
                 s.Username(rabbitMqConfig.Username);
                 s.Password(rabbitMqConfig.Password);
             });
-            cfg.ReceiveEndpoint(queueName, e => e.Consumer<PageDownloadedConsumer>());
+            cfg.ReceiveEndpoint(queueName, e =>
+            {
+                e.Consumer<PageDownloadedConsumer>();
+                e.Consumer<PageDownloadedFaultConsumer>();
+            });
         });
     }
 

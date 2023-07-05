@@ -4,7 +4,6 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-Console.WriteLine(builder.Configuration.GetConnectionString("postgresql"));
 builder.Services.AddDbContext<AppDbContext>(p => p.UseNpgsql(builder.Configuration.GetConnectionString("postgresql")));
 
 builder.Services.AddMassTransit(p =>
@@ -34,5 +33,11 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
 
 app.Run();

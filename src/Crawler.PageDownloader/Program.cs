@@ -7,15 +7,13 @@ using Topshelf.Runtime.DotNetCore;
 HostFactory.Run(h =>
 {
     if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-    {
         h.UseEnvironmentBuilder(target => new DotNetCoreEnvironmentBuilder(target));
-    }
-    
+
     h.Service<PageDownloaderService>(s =>
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.Development.json", optional: false);
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ENVIRONMENT")}.json", false);
 
         IConfiguration config = builder.Build();
 

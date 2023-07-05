@@ -7,20 +7,17 @@ using Topshelf.Runtime.DotNetCore;
 HostFactory.Run(h =>
 {
     if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-    {
         h.UseEnvironmentBuilder(target => new DotNetCoreEnvironmentBuilder(target));
-    }
 
     h.Service<LinkExtractorService>(s =>
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.Development.json", optional: false);
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ENVIRONMENT")}.json", false);
 
         IConfiguration config = builder.Build();
 
 
-        
         s.ConstructUsing(_ => new LinkExtractorService("link-extracted-service", config));
         s.WhenStarted(tc => tc.Start(null));
         s.WhenStopped(tc => tc.Stop(null));

@@ -9,20 +9,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Crawler.Data\Crawler.Data.csproj" />
-      <ProjectReference Include="..\Crawler.Shared\Crawler.Shared.csproj" />
+        <ProjectReference Include="..\Crawler.Data\Crawler.Data.csproj"/>
+        <ProjectReference Include="..\Crawler.Shared\Crawler.Shared.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="appsettings.Development.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <Content Include="..\..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
+        <None Remove="appsettings.Development.json"/>
+        <Content Include="appsettings.Development.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="appsettings.Production.json"/>
+        <Content Include="appsettings.Production.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>

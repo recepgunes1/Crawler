@@ -14,12 +14,9 @@ public class LinkExtractedUrlConsumer : IConsumer<LinkExtractedUrl>
 {
     public async Task Consume(ConsumeContext<LinkExtractedUrl> context)
     {
-        const string urlPattern = @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?";
-        var matches = Regex.Matches(context.Message.SourceCode, urlPattern)
-            .Select(p => p.Value)
-            .Distinct();
-
-        var configuration = new ConfigurationBuilder().AddJsonFile($"appsettings.Development.json");
+        var configuration =
+            new ConfigurationBuilder().AddJsonFile(
+                $"appsettings.{Environment.GetEnvironmentVariable("ENVIRONMENT")}.json");
         var config = configuration.Build();
         var connectionString = config.GetConnectionString("postgresql");
 
@@ -27,19 +24,26 @@ public class LinkExtractedUrlConsumer : IConsumer<LinkExtractedUrl>
         builder.UseNpgsql(connectionString);
 
         AppDbContext dbContext = new(builder.Options);
-        List<Link> linksToInsert = new List<Link>();
+        var linksToInsert = new List<Link>();
+
+        var pageDatum = await dbContext.PageData.FirstAsync(p => p.LinkId == context.Message.Id);
+        var target = await dbContext.Links.FindAsync(context.Message.Id);
+        const string urlPattern = @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?";
+        var matches = Regex.Matches(pageDatum.SourceCode, urlPattern)
+            .Select(p => p.Value)
+            .Distinct();
+
 
         foreach (var match in matches)
         {
-            if (await dbContext.Links.AnyAsync(p => p.Url == match))
-            {
-                continue;
-            }
-            var flagMatchingHost = Url.GetRegistrableDomain(match) == context.Message.Host &&
-                                   Url.GetSubDomain(match) == "www";
+            if (dbContext.Links.Any(p => p.Url == match)) continue;
+            var flagMatchingHost =
+                UrlHelpers.GetRegistrableDomain(match) == UrlHelpers.GetRegistrableDomain(target.Url) &&
+                UrlHelpers.GetSubDomain(match) == "www" &&
+                UrlHelpers.IsValidUrl(match);
             var link = new Link
             {
-                SourceId = context.Message.LinkId,
+                SourceId = pageDatum.LinkId,
                 Url = match,
                 Status = flagMatchingHost ? Status.Requested : Status.DontCrawl
             };
@@ -47,21 +51,17 @@ public class LinkExtractedUrlConsumer : IConsumer<LinkExtractedUrl>
             linksToInsert.Add(link);
 
             if (flagMatchingHost)
-            {
                 await context.Publish(new RequestedUrl
-                    { Id = link.Id, Url = match });
-            }
+                    { Id = link.Id });
         }
 
         // Insert all links at once
-        if(linksToInsert.Count > 0)
-        {
-            await dbContext.BulkInsertAsync(linksToInsert);
-        }
+        if (linksToInsert.Count > 0) await dbContext.BulkInsertAsync(linksToInsert);
 
-        var page = await dbContext.PageData.FirstAsync(p => p.LinkId == context.Message.LinkId);
+        var page = await dbContext.PageData.FirstAsync(p => p.LinkId == pageDatum.LinkId);
         page.Status = Status.LinkExtracted;
-
+        var url = await dbContext.Links.FindAsync(pageDatum.LinkId);
+        url!.Status = Status.SourceCodeDownloaded;
         try
         {
             await dbContext.BulkSaveChangesAsync();
@@ -69,7 +69,7 @@ public class LinkExtractedUrlConsumer : IConsumer<LinkExtractedUrl>
         catch (Exception ex)
         {
             Console.WriteLine("=======================================================");
-            Console.WriteLine($"{ex.Message}");
+            Console.WriteLine(ex.ToJsonString());
             Console.WriteLine("=======================================================");
             throw;
         }

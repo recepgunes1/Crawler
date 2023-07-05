@@ -12,11 +12,12 @@ namespace Crawler.WebAPI.Controllers;
 [Route("api/[controller]")]
 public class ProcessController : Controller
 {
-    private readonly IPublishEndpoint _publishEndpoint;
-    private readonly ILogger<ProcessController> _logger;
     private readonly AppDbContext _appDbContext;
+    private readonly ILogger<ProcessController> _logger;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public ProcessController(IPublishEndpoint publishEndpoint, ILogger<ProcessController> logger, AppDbContext appDbContext)
+    public ProcessController(IPublishEndpoint publishEndpoint, ILogger<ProcessController> logger,
+        AppDbContext appDbContext)
     {
         _publishEndpoint = publishEndpoint;
         _logger = logger;
@@ -30,8 +31,7 @@ public class ProcessController : Controller
         _logger.LogInformation("Starting Start method with URL: {Url}", dto.Url);
         await _publishEndpoint.Publish(new RequestedUrl
         {
-            Id = id,
-            Url = dto.Url
+            Id = id
         });
 
         _logger.LogInformation("Published RequestedUrl message successfully");
