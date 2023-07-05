@@ -33,10 +33,11 @@ public class ProcessController : Controller
         {
             Id = id
         });
-
+        Console.WriteLine(id);
         _logger.LogInformation("Published RequestedUrl message successfully");
         await _appDbContext.Links.AddAsync(new Link
             { Id = id, SourceId = Guid.Empty.ToString(), Url = dto.Url, Status = Status.Requested });
+        Console.WriteLine(id);
         await _appDbContext.SaveChangesAsync();
         _logger.LogInformation("New Job added to the repository successfully");
 
