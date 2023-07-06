@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Nager.PublicSuffix;
 
 namespace Crawler.Shared.Helper;
@@ -18,10 +19,8 @@ public static class UrlHelpers
         return domainName.SubDomain;
     }
 
-    public static bool IsValidUrl(string url)
+    public static string RemoveSpaces(this string url)
     {
-        var result = Uri.TryCreate(url, UriKind.Absolute, out var uri)
-                     && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
-        return result;
+        return Regex.Replace(url, @"\s+", string.Empty);
     }
 }

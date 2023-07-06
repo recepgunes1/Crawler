@@ -29,50 +29,31 @@ public class BookParsedConsumer : IConsumer<BookParsed>
                         throw new ArgumentNullException();
         var document = new HtmlDocument();
         document.LoadHtml(pageDatum.SourceCode);
-        //image xpath:  /html/body/div[5]/div/div/div[8]/div/div[1]/div[1]/div/div[1]/div/div[1]/a
-        //book title:   /html/body/div[5]/div/div/div[8]/div/div[2]/div[1]/h1
-        //author:       /html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div/a
-        //publisher:    /html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[3]/div/a
-        //description   /html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[3]/div
-        //isbn:         /html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div[1]/table/tbody/tr[3]/td[2]
-        //pages:        /html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div[1]/table/tbody/tr[5]/td[2]
-        //category      /html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[2]/div[3]/div
         var imageLink = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[1]/div[1]/div/div[1]/div/div[1]/a")
-            .Attributes["href"].Value;
+            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[1]/div[1]/div/div/div/div[1]/a/img")
+            .Attributes["src"].Value;
         var title = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[1]/h1")
+            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[1]")
             .InnerText;
         var author = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div/a")
+            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]")
             .InnerText;
         var publisher = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[3]/div/a")
+            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[3]")
             .InnerText;
         var description = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[3]/div")
+            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[2]/div[1]/div[1]/div[3]")
             .InnerText;
-        var isbn = document.DocumentNode
-            .SelectSingleNode(
-                "/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div[1]/table/tbody/tr[3]/td[2]")
-            .InnerText;
-        var pages = document.DocumentNode
-            .SelectSingleNode(
-                "/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[2]/div[1]/div[1]/table/tbody/tr[5]/td[2]")
-            .InnerText;
-        var category = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[2]/div[3]/div]").InnerText;
-
+        // var category = document.DocumentNode
+        //     .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[2]/div[1]/div[2]/div[2]/div/ul").InnerText;
         var book = new Book
         {
             ImageLink = imageLink,
-            Title = title,
-            Author = author,
-            Publisher = publisher,
-            Description = description,
-            Isbn = isbn,
-            Pages = pages,
-            Category = category
+            Title = title.Trim(),
+            Author = author.Trim(),
+            Publisher = publisher.Trim(),
+            Description = description.Trim()
+            // Category = category.Trim()
         };
 
         link.Status = Status.Parsed;
