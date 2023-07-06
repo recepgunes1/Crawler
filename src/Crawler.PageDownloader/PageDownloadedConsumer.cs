@@ -27,7 +27,7 @@ public class PageDownloadedConsumer : IConsumer<RequestedUrl>
         client.DefaultRequestHeaders.Add("User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36");
         client.DefaultRequestHeaders.Add("Referer", link.Url);
-        
+
         var sourceCode = client.GetStringAsync(link.Url).GetAwaiter().GetResult();
         dbContext.PageData.Add(new PageDatum
         {
@@ -38,6 +38,10 @@ public class PageDownloadedConsumer : IConsumer<RequestedUrl>
         link.Status = Status.SourceCodeDownloaded;
         await dbContext.SaveChangesAsync();
         await context.Publish(new LinkExtractedUrl
+        {
+            Id = link.Id
+        });
+        await context.Publish(new ClassifiedUrl
         {
             Id = link.Id
         });

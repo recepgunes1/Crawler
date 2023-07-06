@@ -72,3 +72,31 @@ services:
         condition: service_healthy
       s_rabbitmq:
         condition: service_healthy
+  
+  s_classifier:
+    container_name: c_classifier
+    image: crawler.classifier
+    build:
+      context: .
+      dockerfile: src/Crawler.Classifier/Dockerfile
+    environment:
+      ENVIRONMENT: Production
+    depends_on:
+      s_database:
+        condition: service_healthy
+      s_rabbitmq:
+        condition: service_healthy
+
+  s_bookparser:
+    container_name: c_bookparser
+    image: crawler.bookparser
+    build:
+      context: .
+      dockerfile: src/Crawler.BookParser/Dockerfile
+    environment:
+      ENVIRONMENT: Production
+    depends_on:
+      s_database:
+        condition: service_healthy
+      s_rabbitmq:
+        condition: service_healthy

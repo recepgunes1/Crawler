@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Crawler.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230702171301_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20230706153337_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,40 @@ namespace Crawler.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Crawler.Data.Entities.Book", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Author")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Isbn")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Pages")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Publisher")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Books");
+                });
 
             modelBuilder.Entity("Crawler.Data.Entities.Link", b =>
                 {
