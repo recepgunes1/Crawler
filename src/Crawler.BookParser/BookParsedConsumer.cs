@@ -33,19 +33,17 @@ public class BookParsedConsumer : IConsumer<BookParsed>
             .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[1]/div[1]/div/div/div/div[1]/a/img")
             .Attributes["src"].Value;
         var title = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[1]")
+            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[1]")
             .InnerText;
         var author = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]")
+            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]")
             .InnerText;
         var publisher = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[3]")
+            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[3]")
             .InnerText;
         var description = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[2]/div[1]/div[1]/div[3]")
+            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[3]/div")
             .InnerText;
-        // var category = document.DocumentNode
-        //     .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[2]/div[2]/div[1]/div[2]/div[2]/div/ul").InnerText;
         var book = new Book
         {
             ImageLink = imageLink,
@@ -53,7 +51,6 @@ public class BookParsedConsumer : IConsumer<BookParsed>
             Author = author.Trim(),
             Publisher = publisher.Trim(),
             Description = description.Trim()
-            // Category = category.Trim()
         };
 
         link.Status = Status.Parsed;
