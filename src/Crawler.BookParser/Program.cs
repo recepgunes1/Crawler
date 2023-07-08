@@ -22,7 +22,7 @@ HostFactory.Run(h =>
         s.WhenStopped(tc => tc.Stop(null));
     });
     h.RunAsLocalSystem();
-    h.SetDescription("Link Extractor Service Description");
-    h.SetDisplayName("Link Extractor Service");
-    h.SetServiceName("LinkExtractorService");
+    h.SetDescription("Book Parser Service Description");
+    h.SetDisplayName("Book Parser Service");
+    h.SetServiceName("BookParserService");
 });

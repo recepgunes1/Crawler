@@ -29,28 +29,23 @@ public class BookParsedConsumer : IConsumer<BookParsed>
                         throw new ArgumentNullException();
         var document = new HtmlDocument();
         document.LoadHtml(pageDatum.SourceCode);
-        var imageLink = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[7]/div/div[1]/div[1]/div/div/div/div[1]/a/img")
-            .Attributes["src"].Value;
-        var title = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[1]")
-            .InnerText;
-        var author = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]")
-            .InnerText;
-        var publisher = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[3]")
-            .InnerText;
-        var description = document.DocumentNode
-            .SelectSingleNode("/html/body/div[5]/div/div/div[8]/div/div[2]/div[2]/div[1]/div[1]/div[3]/div")
-            .InnerText;
+        var imageLink = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/div/meta[4]").Attributes["content"].Value;
+        var title = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/div/meta[6]").Attributes["content"]
+            .Value;
+        var isbn = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/div/meta[3]").Attributes["content"]
+            .Value;
+        var description = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/div/meta[7]")
+            .Attributes["content"].Value;
+        var publisherNodes = document.DocumentNode.SelectNodes("//div[@itemprop='brand']//meta[@itemprop='name']")
+            .Select(p => p.Attributes["content"].Value);
+        var publisher = string.Join(";", publisherNodes);
         var book = new Book
         {
             ImageLink = imageLink,
-            Title = title.Trim(),
-            Author = author.Trim(),
+            Title = title?.Trim(),
             Publisher = publisher.Trim(),
-            Description = description.Trim()
+            Description = description?.Trim(),
+            Isbn = isbn?.Trim()
         };
 
         link.Status = Status.Parsed;
