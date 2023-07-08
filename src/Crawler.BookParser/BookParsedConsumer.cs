@@ -1,3 +1,5 @@
+using System.Text;
+using Crawler.BookParser.JsonModels;
 using Crawler.Data.Context;
 using Crawler.Data.Entities;
 using Crawler.Shared.Configuration;
@@ -6,6 +8,7 @@ using HtmlAgilityPack;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Crawler.BookParser;
 
@@ -29,25 +32,21 @@ public class BookParsedConsumer : IConsumer<BookParsed>
                         throw new ArgumentNullException();
         var document = new HtmlDocument();
         document.LoadHtml(pageDatum.SourceCode);
-        var imageLink = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/div/meta[4]").Attributes["content"].Value;
-        var title = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/div/meta[6]").Attributes["content"]
-            .Value;
-        var isbn = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/div/meta[3]").Attributes["content"]
-            .Value;
-        var description = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/div/meta[7]")
-            .Attributes["content"].Value;
-        var publisherNodes = document.DocumentNode.SelectNodes("//div[@itemprop='brand']//meta[@itemprop='name']")
-            .Select(p => p.Attributes["content"].Value);
-        var publisher = string.Join(";", publisherNodes);
+        var jsonData = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/script[1]").InnerText;
+        var bytes = Encoding.Default.GetBytes(jsonData);
+        var jsonString = Encoding.UTF8.GetString(bytes);
+        var jsonBook = JsonConvert.DeserializeObject<JsonBook>(jsonString);
         var book = new Book
         {
-            ImageLink = imageLink,
-            Title = title?.Trim(),
-            Publisher = publisher.Trim(),
-            Description = description?.Trim(),
-            Isbn = isbn?.Trim()
+            LinkId = link.Id,
+            ImageLink = jsonBook?.Image.Trim(),
+            Title = jsonBook?.Name.Trim(),
+            Isbn = jsonBook?.Isbn.Trim(),
+            Pages = jsonBook?.NumberOfPages.Trim(),
+            Author = jsonBook?.Author.Name.Trim(),
+            Publisher = jsonBook?.Publisher.Name.Trim(),
+            Description = jsonBook?.Description.Trim()
         };
-
         link.Status = Status.Parsed;
         pageDatum.Status = Status.Parsed;
         dbContext.Books.Add(book);

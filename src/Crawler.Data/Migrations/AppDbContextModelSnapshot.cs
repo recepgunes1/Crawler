@@ -39,7 +39,14 @@ namespace Crawler.Data.Migrations
                     b.Property<string>("ImageLink")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("InsertedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Isbn")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LinkId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Pages")

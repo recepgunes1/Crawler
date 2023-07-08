@@ -16,6 +16,7 @@ namespace Crawler.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    LinkId = table.Column<string>(type: "text", nullable: false),
                     ImageLink = table.Column<string>(type: "text", nullable: true),
                     Title = table.Column<string>(type: "text", nullable: true),
                     Author = table.Column<string>(type: "text", nullable: true),
@@ -23,7 +24,8 @@ namespace Crawler.Data.Migrations
                     Description = table.Column<string>(type: "text", nullable: true),
                     Isbn = table.Column<string>(type: "text", nullable: true),
                     Pages = table.Column<string>(type: "text", nullable: true),
-                    Category = table.Column<string>(type: "text", nullable: true)
+                    Category = table.Column<string>(type: "text", nullable: true),
+                    InsertedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {

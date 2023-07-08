@@ -3,6 +3,7 @@ namespace Crawler.Data.Entities;
 public class Book
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string LinkId { get; set; } = null!;
     public string? ImageLink { get; set; }
     public string? Title { get; set; }
     public string? Author { get; set; }
@@ -11,4 +12,5 @@ public class Book
     public string? Isbn { get; set; }
     public string? Pages { get; set; }
     public string? Category { get; set; }
+    public DateTime InsertedAt { get; set; } = DateTime.UtcNow;
 }
