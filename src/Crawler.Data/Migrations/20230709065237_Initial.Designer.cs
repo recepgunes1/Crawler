@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Crawler.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230708190145_Initial")]
+    [Migration("20230709065237_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,6 +24,32 @@ namespace Crawler.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Crawler.Data.Entities.Author", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("InsertedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LinkId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Authors");
+                });
 
             modelBuilder.Entity("Crawler.Data.Entities.Book", b =>
                 {

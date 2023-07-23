@@ -22,16 +22,22 @@ public class ClassifiedUrlConsumer : IConsumer<ClassifiedUrl>
 
         AppDbContext dbContext = new(builder.Options);
         var link = await dbContext.Links.FindAsync(context.Message.Id) ?? throw new ArgumentNullException();
-        link.Status = Status.Classified;
+
         if (link.Url.Contains("/kitap/"))
             await context.Publish(new BookParsed
             {
                 Id = link.Id
             });
         else if (link.Url.Contains("/yazar/"))
-            Console.WriteLine($"{link.Url}-->yazar");
+            await context.Publish(new AuthorParsed
+            {
+                Id = link.Id
+            });
         else if (link.Url.Contains("/yayinevi/"))
-            Console.WriteLine($"{link.Url}-->yayinevi");
+            Console.WriteLine($"Link ID: {link.Id} was publisher, ain't published any service.");
+
+        link.Status = Status.Classified;
         await dbContext.SaveChangesAsync();
+        Console.WriteLine($"Link ID: {link.Id} was classified.");
     }
 }

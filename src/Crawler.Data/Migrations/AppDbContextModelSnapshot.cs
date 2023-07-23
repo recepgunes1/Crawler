@@ -22,6 +22,32 @@ namespace Crawler.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Crawler.Data.Entities.Author", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImageLink")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("InsertedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LinkId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Authors");
+                });
+
             modelBuilder.Entity("Crawler.Data.Entities.Book", b =>
                 {
                     b.Property<string>("Id")

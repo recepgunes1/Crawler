@@ -12,6 +12,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<Link> Links { get; set; } = default!;
     public DbSet<PageDatum> PageData { get; set; } = default!;
     public DbSet<Book> Books { get; set; } = default!;
+    public DbSet<Author> Authors { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -100,3 +100,17 @@ services:
         condition: service_healthy
       s_rabbitmq:
         condition: service_healthy
+
+  s_authorparser:
+    container_name: c_authorparser
+    image: crawler.authorparser
+    build:
+      context: .
+      dockerfile: src/Crawler.AuthorParser/Dockerfile
+    environment:
+      ENVIRONMENT: Production
+    depends_on:
+      s_database:
+        condition: service_healthy
+      s_rabbitmq:
+        condition: service_healthy

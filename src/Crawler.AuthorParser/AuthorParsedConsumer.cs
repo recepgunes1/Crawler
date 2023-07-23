@@ -1,5 +1,3 @@
-using System.Text;
-using Crawler.BookParser.JsonModels;
 using Crawler.Data.Context;
 using Crawler.Data.Entities;
 using Crawler.Shared.Configuration;
@@ -8,13 +6,12 @@ using HtmlAgilityPack;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 
-namespace Crawler.BookParser;
+namespace Crawler.AuthorParser;
 
-public class BookParsedConsumer : IConsumer<BookParsed>
+public class AuthorParsedConsumer : IConsumer<AuthorParsed>
 {
-    public async Task Consume(ConsumeContext<BookParsed> context)
+    public async Task Consume(ConsumeContext<AuthorParsed> context)
     {
         var configuration =
             new ConfigurationBuilder().AddJsonFile(
@@ -32,25 +29,13 @@ public class BookParsedConsumer : IConsumer<BookParsed>
                         throw new ArgumentNullException();
         var document = new HtmlDocument();
         document.LoadHtml(pageDatum.SourceCode);
-        var jsonData = document.DocumentNode.SelectSingleNode("/html/body/div[5]/div/script[1]").InnerText;
-        var bytes = Encoding.Default.GetBytes(jsonData);
-        var jsonString = Encoding.UTF8.GetString(bytes);
-        var jsonBook = JsonConvert.DeserializeObject<JsonBook>(jsonString);
-        var book = new Book
-        {
-            LinkId = link.Id,
-            ImageLink = jsonBook?.Image.Trim(),
-            Title = jsonBook?.Name.Trim(),
-            Isbn = jsonBook?.Isbn.Trim(),
-            Pages = jsonBook?.NumberOfPages.Trim(),
-            Author = jsonBook?.Author.Name.Trim(),
-            Publisher = jsonBook?.Publisher.Name.Trim(),
-            Description = jsonBook?.Description.Trim()
-        };
+
+        //parse author value 
+
+        var author = new Author();
         link.Status = Status.Parsed;
         pageDatum.Status = Status.Parsed;
-        dbContext.Books.Add(book);
+        dbContext.Authors.Add(author);
         await dbContext.SaveChangesAsync();
-        Console.WriteLine($"Link ID: {link.Id} was parsed.");
     }
 }

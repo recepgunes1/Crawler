@@ -55,5 +55,6 @@ public class LinkExtractedUrlConsumer : IConsumer<LinkExtractedUrl>
         pageDatum.Status = Status.LinkExtracted;
         link.Status = Status.LinkExtracted;
         await dbContext.SaveChangesAsync();
+        Console.WriteLine($"Link ID: {link.Id} links extracted.");
     }
 }

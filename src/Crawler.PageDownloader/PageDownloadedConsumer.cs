@@ -45,5 +45,6 @@ public class PageDownloadedConsumer : IConsumer<RequestedUrl>
         {
             Id = link.Id
         });
+        Console.WriteLine($"Link ID: {link.Id} source code downloaded.");
     }
 }
